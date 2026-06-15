@@ -1,0 +1,43 @@
+<resources>
+    <layout id="main">
+        <drawable id="background" />
+        <drawable id="foreground" />
+
+        <drawable id="analogClock" class="AnalogClockView">
+            <param name="locX">130</param>
+            <param name="locY">130</param>
+            <param name="hourHandResId">@Drawables.HourHand</param>
+            <param name="minuteHandResId">@Drawables.MinuteHand</param>
+        </drawable>
+
+        <drawable id="smallAnalogClock" class="SmallAnalogClockView">
+            <param name="locX">62</param>
+            <param name="locY">113</param>
+            <param name="hourHandResId">@Drawables.SmallHourHand</param>
+            <param name="minuteHandResId">@Drawables.SmallMinuteHand</param>
+        </drawable>
+
+        <label id="currentTime" visible="true" x="189" y="135" text="10:10" color="#AAAAAA" font="Graphics.FONT_LARGE" justification="Graphics.TEXT_JUSTIFY_CENTER" />
+        <label id="weekDay" visible="true" x="236" y="110" text="MON" color="#AAAAAA" font="Graphics.FONT_TINY" justification="Graphics.TEXT_JUSTIFY_RIGHT" />
+        <label id="monthAndDate" visible="true" x="234" y="90" text="JAN 01" color="#AAAAAA" font="Graphics.FONT_TINY" justification="Graphics.TEXT_JUSTIFY_RIGHT" />
+        <label id="stepsCount" visible="true" x="146" y="220" text="12345" color="#AAAAAA" font="Graphics.FONT_GLANCE" justification="Graphics.TEXT_JUSTIFY_RIGHT" />
+        <label id="heartRate" visible="true" x="176" y="190" text="75" color="#AAAAAA" font="Graphics.FONT_TINY" justification="Graphics.TEXT_JUSTIFY_CENTER" />
+        <label id="energyLevel" visible="true" x="140" y="203" text="80%" color="#AAAAAA" font="Graphics.FONT_GLANCE" justification="Graphics.TEXT_JUSTIFY_RIGHT" />
+        <label id="barometer" visible="true" x="68" y="150" text="1013" color="#AAAAAA" font="Graphics.FONT_GLANCE" justification="Graphics.TEXT_JUSTIFY_RIGHT" />
+        <label id="battery" visible="true" x="130" y="170" text="80%" color="#AAAAAA" font="Graphics.FONT_XTINY" justification="Graphics.TEXT_JUSTIFY_CENTER" />
+
+        <drawable id="secondsClock" class="SecondsClockView">
+            <param name="locX">130</param>
+            <param name="locY">130</param>
+            <param name="rezId">@Drawables.SecondsHand</param>
+        </drawable>
+
+        <drawable id="infoWeather" class="InfoWeather">
+            <param name="locX">138</param>
+            <param name="locY">28</param>
+            <param name="width">40</param>
+            <param name="color">Graphics.COLOR_LT_GRAY</param>
+        </drawable>
+    </layout>
+
+</resources>

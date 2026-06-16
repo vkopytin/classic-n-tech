@@ -102,6 +102,8 @@ class WatchFaceView extends WatchUi.WatchFace {
     private var barometer = null as Toybox.WatchUi.Text?;
     private var battery = null as Toybox.WatchUi.Text?;
 
+    private var renderPhase = false;
+
     function initialize() {
         Complications.registerComplicationChangeCallback(method(:updateComplication));
         Complications.subscribeToUpdates(new Complications.Id(Complications.COMPLICATION_TYPE_SUNRISE));
@@ -141,8 +143,10 @@ class WatchFaceView extends WatchUi.WatchFace {
         self.hand = WatchUi.loadResource(@Rez.Drawables.SecondsHand);
 
         //self.currentTime.setFont(Graphics.getVectorFont({:face => "BionicBold", :size => 50}));
-        self.drawBuffer[0] = Graphics.createBufferedBitmap(self.initBufferOptions).get();
-        self.drawBuffer[1] = Graphics.createBufferedBitmap(self.initBufferOptions).get();
+        self.drawBuffer = [
+            Graphics.createBufferedBitmap(self.initBufferOptions).get(),
+            Graphics.createBufferedBitmap(self.initBufferOptions).get()
+        ];
         self.buffer = Graphics.createBufferedBitmap(self.initBufferOptions1).get();
         self.backBuffer = Graphics.createBufferedBitmap(self.initBufferOptions).get();
         self.frontBuffer = Graphics.createBufferedBitmap(self.initBufferOptions).get();
@@ -281,6 +285,11 @@ class WatchFaceView extends WatchUi.WatchFace {
 
     // Update the view
     function onUpdate(dc as Dc) as Void {
+        if (self.renderPhase) {
+            self.renderPhase = false;
+        } else {
+            self.syncData();
+        }
         dc.clearClip();
         if (self.sleepMode) {
             self.engineTick(1000);
@@ -353,6 +362,7 @@ class WatchFaceView extends WatchUi.WatchFace {
 
     function engineTick(deltaTime) as Void {
         self.clockTime = System.getClockTime();
+        self.seconds = self.clockTime.sec;
         // self.secondsDisk.setSeconds(clockTime.sec);
         self.analogClock.setTime(self.clockTime.hour, self.clockTime.min, self.clockTime.sec);
         self.smallAnalogClock.setTime(self.clockTime.hour, self.clockTime.min, self.clockTime.sec);
@@ -364,6 +374,35 @@ class WatchFaceView extends WatchUi.WatchFace {
         dc.setAntiAlias(true);
 
         try {
+            self.quota = 1030;
+
+            var refresh = self.minutes != self.clockTime.min;
+            self.updateBackBuffer(dc, refresh);
+            self.updateFrontBuffer(dc, refresh);
+            self.updateInfoBuffer(dc);
+            self.minutes = self.clockTime.min;
+
+            dc.drawBitmap(0, 0, self.backBuffer);
+            dc.drawBitmap(0, 0, self.infoBuffer);
+            dc.drawBitmap(0, 0, self.frontBuffer);
+
+            var bufferdc = self.buffer.getDc();
+            bufferdc.drawBitmap(0, 0, self.hand);
+        } catch (ex) {
+            var message = ex.getErrorMessage();
+            System.println(message);
+            dc.setColor(Graphics.COLOR_LT_GRAY, Graphics.COLOR_TRANSPARENT);
+            dc.drawText(10, 120, Graphics.FONT_TINY, message, Graphics.TEXT_JUSTIFY_LEFT|Graphics.TEXT_JUSTIFY_VCENTER);
+        }
+
+        self.renderPhase = true;
+        if (!self.sleepMode) {
+            WatchUi.requestUpdate();
+        }
+    }
+
+    function syncData() as Void {
+        try {
             var activityMonitor = ActivityMonitor.getInfo();
             if (activityMonitor != null && activityMonitor.steps != null) {
               var steps = activityMonitor.steps / 1000.0;
@@ -372,8 +411,6 @@ class WatchFaceView extends WatchUi.WatchFace {
 
             var now = Time.now();
             var date = Date.info(now, Time.FORMAT_SHORT);
-            // set (date.day_of_week);
-            // set (date.day, date.month);
 
             var stressIterator = Toybox.SensorHistory.getHeartRateHistory({ :period => 1 });
             var sample = stressIterator.next();
@@ -402,7 +439,6 @@ class WatchFaceView extends WatchUi.WatchFace {
 
             self.clockTime = System.getClockTime();
             self.seconds = self.clockTime.sec;
-            self.quota = 1030;
 
             self.currentTime.setText(Lang.format("$1$:$2$", [self.clockTime.hour.format("%02d"), self.clockTime.min.format("%02d")]));
             self.weekDay.setText(WEEK_DAYS[date.day_of_week]);
@@ -414,28 +450,7 @@ class WatchFaceView extends WatchUi.WatchFace {
             var dayNightPosition = (self.clockTime.hour + self.clockTime.min / 60.0) / 24.0 * 240.0 - 200.0;
             self.transformDayNight.initialize();
             self.transformDayNight.translate(dayNightPosition, 70.0);
-
-            var refresh = self.minutes != self.clockTime.min;
-            self.updateBackBuffer(dc, refresh);
-            self.updateFrontBuffer(dc, refresh);
-            self.updateInfoBuffer(dc);
-            self.minutes = self.clockTime.min;
-
-            dc.drawBitmap(0, 0, self.backBuffer);
-            dc.drawBitmap(0, 0, self.infoBuffer);
-            dc.drawBitmap(0, 0, self.frontBuffer);
-
-            var bufferdc = self.buffer.getDc();
-            bufferdc.drawBitmap(0, 0, self.hand);
         } catch (ex) {
-            var message = ex.getErrorMessage();
-            System.println(message);
-            dc.setColor(Graphics.COLOR_LT_GRAY, Graphics.COLOR_TRANSPARENT);
-            dc.drawText(10, 120, Graphics.FONT_TINY, message, Graphics.TEXT_JUSTIFY_LEFT|Graphics.TEXT_JUSTIFY_VCENTER);
-        }
-
-        if (!self.sleepMode) {
-            WatchUi.requestUpdate();
         }
     }
 
@@ -449,6 +464,7 @@ class WatchFaceView extends WatchUi.WatchFace {
     // The user has just looked at their watch. Timers and animations may be started here.
     function onExitSleep() as Void {
         self.sleepMode = false;
+        self.syncData();
         self.timer.nextTick();
         self.timer.start();
     }

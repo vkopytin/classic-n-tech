@@ -292,6 +292,7 @@ class WatchFaceView extends WatchUi.WatchFace {
         }
         dc.clearClip();
         if (self.sleepMode) {
+            self.syncData();
             self.engineTick(1000);
             self.currentDrawBuffer = self.currentDrawBuffer ^ 1;
         }

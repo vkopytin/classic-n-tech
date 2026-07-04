@@ -25,6 +25,7 @@
         <label id="energyLevel" visible="true" x="140" y="203" text="80%" color="#AAAAAA" font="Graphics.FONT_GLANCE" justification="Graphics.TEXT_JUSTIFY_RIGHT" />
         <label id="barometer" visible="true" x="68" y="150" text="1013" color="#AAAAAA" font="Graphics.FONT_GLANCE" justification="Graphics.TEXT_JUSTIFY_RIGHT" />
         <label id="battery" visible="true" x="130" y="170" text="80%" color="#AAAAAA" font="Graphics.FONT_XTINY" justification="Graphics.TEXT_JUSTIFY_CENTER" />
+        <label id="secondCity" visible="true" x="63" y="128" text="NYC" color="#AAAAAA" font="Graphics.FONT_XTINY" justification="Graphics.TEXT_JUSTIFY_CENTER" />
 
         <drawable id="secondsClock" class="SecondsClockView">
             <param name="locX">130</param>

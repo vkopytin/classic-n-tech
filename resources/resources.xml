@@ -1,0 +1,32 @@
+<resources>
+    <jsonData id="Cities">
+        [
+            ["Pago Pago (GMT-11)", -14.278, -170.702, "PAGO"],
+            ["Honolulu (GMT-10)", 21.306, -157.858, "HNL"],
+            ["Anchorage (GMT-9)", 61.218, -149.900, "ANC"],
+            ["Los Angeles (GMT-8)", 34.052, -118.243, "LAX"],
+            ["Denver (GMT-7)", 39.739, -104.990, "DEN"],
+            ["Chicago (GMT-6)", 41.878, -87.629, "CHI"],
+            ["New York (GMT-5)", 40.712, -74.006, "NYC"],
+            ["Halifax (GMT-4)", 44.648, -63.575, "HAL"],
+            ["Sao Paulo (GMT-3)", -23.550, -46.633, "SAO"],
+            ["Fernando de N. (GMT-3)", -3.840, -32.411, "FEN"],
+            ["Praia (GMT-1)", 14.933, -23.513, "PRA"],
+            ["London (GMT+0)", 51.507, -0.127, "LON"],
+            ["Paris (GMT+1)", 48.856, 2.352, "PAR"],
+            ["Warsaw (GMT+2)", 52.229, 21.012, "WAW"],
+            ["Moscow (GMT+3)", 55.755, 37.617, "MOW"],
+            ["Dubai (GMT+4)", 25.204, 55.270, "DXB"],
+            ["Karachi (GMT+5)", 24.860, 67.001, "KHI"],
+            ["Dhaka (GMT+6)", 23.810, 90.412, "DAC"],
+            ["Bangkok (GMT+7)", 13.756, 100.501, "BKK"],
+            ["Singapore (GMT+8)", 1.352, 103.819, "SIN"],
+            ["Tokyo (GMT+9)", 35.676, 139.650, "TYO"],
+            ["Sydney (GMT+10)", -33.868, 151.209, "SYD"],
+            ["Noumea (GMT+11)", -22.273, 166.446, "NOU"],
+            ["Auckland (GMT+12)", -36.848, 174.763, "AKL"],
+            ["Apia (GMT+13)", -13.833, -171.766, "APW"],
+            ["Kiritimati (GMT+14)", 1.987, -157.477, "KIT"]
+        ]
+    </jsonData>
+</resources>

@@ -1,0 +1,38 @@
+<settings>
+
+    <group id="SecondTimezone" title="@Strings.secondTimezoneTitle" description="@Strings.secondTimezoneDescription">
+
+		<setting propertyKey="@Properties.SecondTimezone" title="@Strings.secondTimezoneMessage" >
+            <settingConfig type="list">
+                <listEntry value="0">Pago Pago (UTC-11)</listEntry>
+                <listEntry value="1">Honolulu (UTC-10)</listEntry>
+                <listEntry value="2">Anchorage (UTC-09)</listEntry>
+                <listEntry value="3">Los Angeles (UTC-08)</listEntry>
+                <listEntry value="4">Denver (UTC-07)</listEntry>
+                <listEntry value="5">Chicago (UTC-06)</listEntry>
+                <listEntry value="6">New York (UTC-05)</listEntry>
+                <listEntry value="7">Halifax (UTC-04)</listEntry>
+                <listEntry value="8">Sao Paulo (UTC-03)</listEntry>
+                <listEntry value="9">Fernando de N. (UTC-02)</listEntry>
+                <listEntry value="10">Praia (UTC-01)</listEntry>
+                <listEntry value="11">London (UTC+00)</listEntry>
+                <listEntry value="12">Paris (UTC+01)</listEntry>
+                <listEntry value="13">Cairo (UTC+02)</listEntry>
+                <listEntry value="14">Moscow (UTC+03)</listEntry>
+                <listEntry value="15">Dubai (UTC+04)</listEntry>
+                <listEntry value="16">Karachi (UTC+05)</listEntry>
+                <listEntry value="17">Dhaka (UTC+06)</listEntry>
+                <listEntry value="18">Bangkok (UTC+07)</listEntry>
+                <listEntry value="19">Singapore (UTC+08)</listEntry>
+                <listEntry value="20">Tokyo (UTC+09)</listEntry>
+                <listEntry value="21">Sydney (UTC+10)</listEntry>
+                <listEntry value="22">Noumea (UTC+11)</listEntry>
+                <listEntry value="23">Auckland (UTC+12)</listEntry>
+                <listEntry value="24">Apia (UTC+13)</listEntry>
+                <listEntry value="25">Kiritimati (UTC+14)</listEntry>
+            </settingConfig>
+		</setting>
+
+    </group>
+
+</settings>

@@ -8,22 +8,6 @@ import Toybox.Application;
 import Toybox.Graphics;
 using Toybox.Time.Gregorian as Date;
 
-const WEEK_DAYS = ["", "SUN", "MON", "TUE", "WED", "THU", "FRI", "SAT"];
-const MONTHS = {
-    Date.MONTH_JANUARY => "JAN",
-    Date.MONTH_FEBRUARY => "FEB",
-    Date.MONTH_MARCH => "MAR",
-    Date.MONTH_APRIL => "APR",
-    Date.MONTH_MAY => "MAY",
-    Date.MONTH_JUNE => "JUN",
-    Date.MONTH_JULY => "JUL",
-    Date.MONTH_AUGUST => "AUG",
-    Date.MONTH_SEPTEMBER => "SEP",
-    Date.MONTH_OCTOBER => "OCT",
-    Date.MONTH_NOVEMBER => "NOV",
-    Date.MONTH_DECEMBER => "DEC"
-};
-
 class WatchFaceView extends WatchUi.WatchFace {
     private const ONE_RAD = Math.PI * 2.0 / 60.0;
     private const timer = MainTimer.create(self);
@@ -92,6 +76,7 @@ class WatchFaceView extends WatchUi.WatchFace {
     private var weekDay = null as Toybox.WatchUi.Text?;
     private var monthAndDate = null as Toybox.WatchUi.Text?;
     private var stepsCount = null as Toybox.WatchUi.Text?;
+    private var secondCity = null as Toybox.WatchUi.Text?;
     private var background = null as Toybox.WatchUi.Drawable?;
     private var foreground = null as Toybox.WatchUi.Drawable?;
     private var dayNightBand = null as WatchUi.BitmapResource?;
@@ -101,6 +86,7 @@ class WatchFaceView extends WatchUi.WatchFace {
     private var energyLevel = null as Toybox.WatchUi.Text?;
     private var barometer = null as Toybox.WatchUi.Text?;
     private var battery = null as Toybox.WatchUi.Text?;
+    private var barometerData = new [116] as Array<Point2D>;
 
     private var renderPhase = false;
 
@@ -112,6 +98,9 @@ class WatchFaceView extends WatchUi.WatchFace {
 
         WatchFace.initialize();
         self.transformMove.translate(130.0, 130.0);
+        for (var i = 0; i < 116; i++) {
+            self.barometerData[i] = [80, 217];
+        }
     }
 
     // Load your resources here
@@ -139,6 +128,7 @@ class WatchFaceView extends WatchUi.WatchFace {
         self.energyLevel = View.findDrawableById("energyLevel");
         self.barometer = View.findDrawableById("barometer");
         self.battery = View.findDrawableById("battery");
+        self.secondCity = View.findDrawableById("secondCity") as Toybox.WatchUi.Text;
         self.smallAnalogClock = View.findDrawableById("smallAnalogClock") as SmallAnalogClockView;
         self.hand = WatchUi.loadResource(@Rez.Drawables.SecondsHand);
 
@@ -155,6 +145,7 @@ class WatchFaceView extends WatchUi.WatchFace {
         self.barometerScaleTexture = new Graphics.BitmapTexture({
             :bitmap => self.barometerScale,
         });
+        self.secondCity.setFont(WatchUi.loadResource(Rez.Fonts.lcdDisplay9));
     }
 
     // Called when this View is brought to the foreground. Restore
@@ -212,6 +203,7 @@ class WatchFaceView extends WatchUi.WatchFace {
 
         infoBufferdc.setAntiAlias(true);
 
+        self.secondCity.draw(infoBufferdc);
         self.smallAnalogClock.draw(infoBufferdc);
         self.weekDay.draw(infoBufferdc);
         self.infoWeather.draw(infoBufferdc);
@@ -273,12 +265,15 @@ class WatchFaceView extends WatchUi.WatchFace {
             -30
         );
 
-        // barometer scale from 860 to 1090 hPa, 58 pixels height
-        var barometerLevel = self.barometerLevel * 0.01 - 860.0;
-        var barometerHeight = 58 * barometerLevel / 230.0;
+        // barometer vertical graph from 860 to 1090 hPa, 58 pixels height
         infoBufferdc.setColor(Graphics.COLOR_LT_GRAY, Graphics.COLOR_TRANSPARENT);
         infoBufferdc.setFill(self.barometerScaleTexture);
-        infoBufferdc.fillRectangle(81, 216, 8, -barometerHeight);
+        self.barometerScaleTexture.setOffset(4, 0);
+        var array1 = self.barometerData.slice(0, 58);
+        infoBufferdc.fillPolygon(array1);
+        self.barometerScaleTexture.setOffset(0, 0);
+        var array2 = self.barometerData.slice(58, 116);
+        infoBufferdc.fillPolygon(array2);
 
         infoBufferdc = null;
     }
@@ -366,7 +361,6 @@ class WatchFaceView extends WatchUi.WatchFace {
         self.seconds = self.clockTime.sec;
         // self.secondsDisk.setSeconds(clockTime.sec);
         self.analogClock.setTime(self.clockTime.hour, self.clockTime.min, self.clockTime.sec);
-        self.smallAnalogClock.setTime(self.clockTime.hour, self.clockTime.min, self.clockTime.sec);
         var currentDrawBuffer = self.currentDrawBuffer;
         self.currentDrawBuffer = self.currentDrawBuffer ^ 1;
         var buffer = self.drawBuffer[currentDrawBuffer];
@@ -406,12 +400,22 @@ class WatchFaceView extends WatchUi.WatchFace {
         try {
             var activityMonitor = ActivityMonitor.getInfo();
             if (activityMonitor != null && activityMonitor.steps != null) {
-              var steps = activityMonitor.steps / 1000.0;
-              self.stepsCount.setText(steps.format("%002.3f"));
+                var steps = activityMonitor.steps;
+                self.stepsCount.setText(steps.format("%d"));
             }
 
             var now = Time.now();
             var date = Date.info(now, Time.FORMAT_SHORT);
+
+            var where = new Position.Location({
+                :latitude  =>  $.secondLocation[1],
+                :longitude =>  $.secondLocation[2],
+                :format    => :degrees,
+            });
+            var local = Gregorian.localMoment(where, Time.now());
+            var today = Gregorian.info(local, Time.FORMAT_SHORT);
+            self.smallAnalogClock.setTime(today.hour, today.min, today.sec);
+            self.secondCity.setText($.secondLocation[3]);
 
             var stressIterator = Toybox.SensorHistory.getHeartRateHistory({ :period => 1 });
             var sample = stressIterator.next();
@@ -420,10 +424,35 @@ class WatchFaceView extends WatchUi.WatchFace {
             }
             if ((Toybox has :SensorHistory) && (Toybox.SensorHistory has :getPressureHistory)) {
 		        sample = Toybox.SensorHistory.getPressureHistory({});
+                var max = sample.getMax();
+                var min = sample.getMin();
+                var diff = max - min;
+                var offsetX = 84.0;
+                var offsetY = 158.0;
                 if (sample != null) {
+                    // iterate over the samples and draw the graph
                     var data = sample.next();
-                    self.barometerLevel = data.data;
-                    self.barometer.setText((data.data / 100).format("%d"));
+                    var value = data.data;
+                    self.barometerLevel = value;
+                    self.barometer.setText((value / 100).format("%d"));
+                    value = arraySumm([
+                        data, sample.next(), sample.next()
+                    ]) / 3.0;
+                    for (var i = 0; i < 58; i++) {
+                        value = (value - min) * 14.0 / diff;
+                        var y = offsetY + i;
+                        var lx = offsetX - (value / 2.0);
+                        var rx = lx + value;
+                        self.barometerData[i] = [rx, y];
+                        self.barometerData[115 - i] = [lx, y];
+                        value = arraySumm([
+                            sample.next(), sample.next(), sample.next()
+                        ]) / 3.0;
+                    }
+                    self.barometerData[0] = [offsetX, offsetY];
+                    self.barometerData[57] = [offsetX, offsetY + 57];
+                    self.barometerData[58] = [offsetX, offsetY + 57];
+                    self.barometerData[115] = [offsetX, offsetY];
                 }
 		    }
             var activityInfo = Activity.getActivityInfo();
@@ -496,4 +525,17 @@ class WatchFaceView extends WatchUi.WatchFace {
                 break;
         }
     }
+
+    function arraySumm(array as Array<Toybox.SensorHistory.SensorSample or Number>) as Number {
+		var sum = 0;
+		for (var i = 0; i < array.size(); i++) {
+			if (array[i] == null) {
+				array[i] = 0;
+			} else {
+				array[i] = array[i].data;
+			}
+			sum += array[i];
+		}
+		return sum;
+	}
 }

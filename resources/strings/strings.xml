@@ -1,3 +1,7 @@
 <strings>
     <string id="AppName">Classic/Tech</string>
+    <string id="Settings">Settings</string>
+    <string id="secondTimezoneTitle">Second Timezone</string>
+    <string id="secondTimezoneDescription">Set the second timezone to display on the watch face</string>
+    <string id="secondTimezoneMessage">Select City for Second Timezone</string>
 </strings>

@@ -2,13 +2,9 @@ import Toybox.Math;
 import Toybox.System;
 
 class PidController {
-    static function create(kP, kI, kD) {
-        return new PidController(kP, kI, kD, 0, 0);
-    }
+    static function create(kP, kI, kD) { return new PidController(kP, kI, kD, 0, 0); }
 
-    static function createWithMax(kP, kI, kD, dt, max) {
-        return new PidController(kP, kI, kD, dt, max);
-    }
+    static function createWithMax(kP, kI, kD, dt, max) { return new PidController(kP, kI, kD, dt, max); }
 
     var kP;
     var kI;
@@ -21,10 +17,10 @@ class PidController {
     var lastError;
     var lastTime;
 
-    function initialize (kP, kI, kD, dt, iMax) {
+    function initialize(kP, kI, kD, dt, iMax) {
         // PID constants
         self.kP = kP;
-        self.kI = kP;
+        self.kI = kI;
         self.kD = kD;
 
         // Interval of time between two updates
@@ -41,9 +37,7 @@ class PidController {
         self.target = 0; // default value, can be modified with .setTarget
     }
 
-    function setTarget(target) {
-        self.target = target;
-    }
+    function setTarget(target) { self.target = target; }
 
     function update(currentValue) {
         self.currentValue = currentValue;
@@ -64,7 +58,7 @@ class PidController {
         }
 
         var error = (self.target - self.currentValue);
-        self.sumError = self.sumError + error*dt;
+        self.sumError = self.sumError + error * dt;
         if (self.iMax > 0 && self.sumError.abs() > self.iMax) {
             var sumSign = (self.sumError > 0) ? 1.0 : -1.0;
             self.sumError = sumSign * self.iMax;
